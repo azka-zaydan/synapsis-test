@@ -2,6 +2,7 @@ package configs
 
 import (
 	"sync"
+	"time"
 
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
@@ -92,6 +93,11 @@ type Config struct {
 			}
 		}
 	}
+
+	JWT struct {
+		ExpiresIn time.Duration `mapstructure:"EXPIRES_IN"`
+		Key       string        `mapstructure:"KEY"`
+	} `mapstructure:"JWT"`
 
 	Server struct {
 		Env      string `mapstructure:"ENV"`
