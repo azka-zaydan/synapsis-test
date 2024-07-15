@@ -1,0 +1,30 @@
+version: "3"
+services:
+  synap-mysql:
+    image: mysql:latest
+    container_name: synap-mysql-db
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: "synap"
+      MYSQL_USER: "user"
+      MYSQL_PASSWORD: "password"
+      MYSQL_ROOT_PASSWORD: "password"
+    volumes:
+      # change with local
+      - /home/azka/code/storage/synap-mysql:/var/lib/mysql
+    expose:
+      - "3306"
+  synap-redis:
+    image: redis:latest
+    container_name: synap-redis
+    restart: always
+    ports:
+      - "6378:6378"
+    volumes:
+      # change with local
+      - /home/azka/code/storage/synap-redis:/root/redis
+    environment:
+      - REDIS_PASSWORD=password
+      - REDIS_PORT=6379
+      - REDIS_DATABASES=16
