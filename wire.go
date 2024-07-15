@@ -11,9 +11,9 @@ import (
 	"github.com/azka-zaydan/synapsis-test/infras"
 	// "github.com/azka-zaydan/synapsis-test/internal/domain/foobarbaz"
 	authService "github.com/azka-zaydan/synapsis-test/internal/domain/auth/service"
+	userRepo "github.com/azka-zaydan/synapsis-test/internal/domain/user/repository"
 	authHandler "github.com/azka-zaydan/synapsis-test/internal/handlers/auth"
 	"github.com/azka-zaydan/synapsis-test/transport/http"
-
 	// "github.com/azka-zaydan/synapsis-test/transport/http/middleware"
 	"github.com/azka-zaydan/synapsis-test/transport/http/router"
 	"github.com/google/wire"
@@ -30,6 +30,11 @@ var persistences = wire.NewSet(
 	infras.RedisNewClient,
 )
 
+var domainUser = wire.NewSet(
+	userRepo.ProvideUserRepositoryMySQL,
+	wire.Bind(new(userRepo.UserRepository), new(*userRepo.UserRepositoryMySQL)),
+)
+
 var domainAuth = wire.NewSet(
 	authService.ProvideAuthServiceImpl,
 	wire.Bind(new(authService.AuthService), new(*authService.AuthServiceImpl)),
@@ -37,7 +42,7 @@ var domainAuth = wire.NewSet(
 
 // Wiring for all domains.
 var domains = wire.NewSet(
-	domainAuth,
+	domainAuth, domainUser,
 )
 
 // var authMiddleware = wire.NewSet(
