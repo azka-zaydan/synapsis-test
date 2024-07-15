@@ -30,6 +30,7 @@ type Config struct {
 				Host     string `mapstructure:"HOST"`
 				Port     string `mapstructure:"PORT"`
 				Password string `mapstructure:"PASSWORD"`
+				DB       int    `mapstructure:"DB"`
 			}
 		}
 	}

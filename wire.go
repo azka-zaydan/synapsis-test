@@ -27,6 +27,7 @@ var configurations = wire.NewSet(
 // Wiring for persistences.
 var persistences = wire.NewSet(
 	infras.ProvideMySQLConn,
+	infras.RedisNewClient,
 )
 
 var domainAuth = wire.NewSet(
