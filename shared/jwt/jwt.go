@@ -26,7 +26,7 @@ func NewJwtService(cfg *configs.Config) *JwtService {
 }
 
 func (s *JwtService) GenerateJWT(username string) (string, error) {
-	expirationTime := time.Now().Add(24 * time.Hour)
+	expirationTime := time.Now().Add(s.cfg.JWT.ExpiresIn)
 	claims := &Claims{
 		Username: username,
 		RegisteredClaims: jwt.RegisteredClaims{
