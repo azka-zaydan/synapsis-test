@@ -11,10 +11,11 @@ import (
 	"github.com/azka-zaydan/synapsis-test/infras"
 	// "github.com/azka-zaydan/synapsis-test/internal/domain/foobarbaz"
 	authService "github.com/azka-zaydan/synapsis-test/internal/domain/auth/service"
+	userRepo "github.com/azka-zaydan/synapsis-test/internal/domain/user/repository"
 	authHandler "github.com/azka-zaydan/synapsis-test/internal/handlers/auth"
+	productHandler "github.com/azka-zaydan/synapsis-test/internal/handlers/product"
 	"github.com/azka-zaydan/synapsis-test/transport/http"
-
-	// "github.com/azka-zaydan/synapsis-test/transport/http/middleware"
+	"github.com/azka-zaydan/synapsis-test/transport/http/middleware"
 	"github.com/azka-zaydan/synapsis-test/transport/http/router"
 	"github.com/google/wire"
 )
@@ -27,6 +28,16 @@ var configurations = wire.NewSet(
 // Wiring for persistences.
 var persistences = wire.NewSet(
 	infras.ProvideMySQLConn,
+	infras.RedisNewClient,
+)
+
+var authMiddleware = wire.NewSet(
+	middleware.ProvideAuthentication,
+)
+
+var domainUser = wire.NewSet(
+	userRepo.ProvideUserRepositoryMySQL,
+	wire.Bind(new(userRepo.UserRepository), new(*userRepo.UserRepositoryMySQL)),
 )
 
 var domainAuth = wire.NewSet(
@@ -36,18 +47,15 @@ var domainAuth = wire.NewSet(
 
 // Wiring for all domains.
 var domains = wire.NewSet(
-	domainAuth,
+	domainAuth, domainUser,
 )
-
-// var authMiddleware = wire.NewSet(
-// 	middleware.ProvideAuthentication,
-// )
 
 // Wiring for HTTP routing.
 var routing = wire.NewSet(
 	wire.Struct(new(router.DomainHandlers), "*"),
 	router.ProvideRouter,
 	authHandler.ProvideAuthHandler,
+	productHandler.ProvideProductHandler,
 )
 
 // Wiring for everything.
@@ -58,7 +66,7 @@ func InitializeService() *http.HTTP {
 		// persistences
 		persistences,
 		// middleware
-		// authMiddleware,
+		authMiddleware,
 		// domains
 		domains,
 		// routing

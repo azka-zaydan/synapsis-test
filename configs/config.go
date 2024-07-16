@@ -2,6 +2,7 @@ package configs
 
 import (
 	"sync"
+	"time"
 
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
@@ -30,8 +31,12 @@ type Config struct {
 				Host     string `mapstructure:"HOST"`
 				Port     string `mapstructure:"PORT"`
 				Password string `mapstructure:"PASSWORD"`
+				DB       int    `mapstructure:"DB"`
 			}
 		}
+		Token struct {
+			ExpiresIn time.Duration `mapstructure:"EXPIRES_IN"`
+		} `mapstructure:"TOKEN"`
 	}
 
 	DB struct {
@@ -91,6 +96,11 @@ type Config struct {
 			}
 		}
 	}
+
+	JWT struct {
+		ExpiresIn time.Duration `mapstructure:"EXPIRES_IN"`
+		Key       string        `mapstructure:"KEY"`
+	} `mapstructure:"JWT"`
 
 	Server struct {
 		Env      string `mapstructure:"ENV"`

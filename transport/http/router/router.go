@@ -2,12 +2,14 @@ package router
 
 import (
 	"github.com/azka-zaydan/synapsis-test/internal/handlers/auth"
+	"github.com/azka-zaydan/synapsis-test/internal/handlers/product"
 	"github.com/gofiber/fiber/v2"
 )
 
 // DomainHandlers is a struct that contains all domain-specific handlers.
 type DomainHandlers struct {
-	AuthHanlder auth.AuthHandler
+	AuthHandler    auth.AuthHandler
+	ProductHandler product.ProductHandler
 }
 
 // Router is the router struct containing handlers.
@@ -25,6 +27,7 @@ func ProvideRouter(domainHandlers DomainHandlers) Router {
 // SetupRoutes sets up all routing for this server.
 func (r *Router) SetupRoutes(app *fiber.App) {
 	app.Route("/v1", func(router fiber.Router) {
-		r.DomainHandlers.AuthHanlder.Router(router)
+		r.DomainHandlers.AuthHandler.Router(router)
+		r.DomainHandlers.ProductHandler.Router(router)
 	})
 }
