@@ -64,7 +64,7 @@ func (s *AuthServiceImpl) Register(ctx context.Context, req dto.RegisterDto) (re
 		log.Error().Err(err).Msg("[Register] Failed CreateUser")
 		return
 	}
-	token, err := s.JwtService.GenerateJWT(user.Username)
+	token, err := s.JwtService.GenerateJWT(user.Username, user.ID.String())
 	if err != nil {
 		log.Error().Err(err).Msg("[Register] Failed Generate Token")
 		return
@@ -125,7 +125,7 @@ func (s *AuthServiceImpl) Login(ctx context.Context, req dto.RegisterDto) (res d
 		log.Error().Err(err).Msg("[Login] Invalid Password")
 		return
 	}
-	token, err = s.JwtService.GenerateJWT(user.Username)
+	token, err = s.JwtService.GenerateJWT(user.Username, user.ID.String())
 	if err != nil {
 		log.Error().Err(err).Msg("[Login] Failed Generate Token")
 		return

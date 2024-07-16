@@ -4,7 +4,9 @@ import (
 	"time"
 
 	"github.com/azka-zaydan/synapsis-test/configs"
-	"github.com/golang-jwt/jwt/v5"
+	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v4"
+	jwtV5 "github.com/golang-jwt/jwt/v5"
 )
 
 type JwtService struct {
@@ -13,8 +15,9 @@ type JwtService struct {
 }
 
 type Claims struct {
+	UserID   string `json:"UserID"`
 	Username string `json:"username"`
-	jwt.RegisteredClaims
+	jwtV5.RegisteredClaims
 }
 
 func NewJwtService(cfg *configs.Config) *JwtService {
@@ -25,25 +28,26 @@ func NewJwtService(cfg *configs.Config) *JwtService {
 	}
 }
 
-func (s *JwtService) GenerateJWT(username string) (string, error) {
+func (s *JwtService) GenerateJWT(username, id string) (string, error) {
 	expirationTime := time.Now().Add(s.cfg.JWT.ExpiresIn)
 	claims := &Claims{
 		Username: username,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(expirationTime),
+		UserID:   id,
+		RegisteredClaims: jwtV5.RegisteredClaims{
+			ExpiresAt: jwtV5.NewNumericDate(expirationTime),
 		},
 	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	token := jwtV5.NewWithClaims(jwtV5.SigningMethodHS256, claims)
 	return token.SignedString(s.key)
 }
 
 func (s *JwtService) ValidateJWT(tokenStr string) (*Claims, error) {
 	claims := &Claims{}
-	token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwtV5.ParseWithClaims(tokenStr, claims, func(token *jwtV5.Token) (interface{}, error) {
 		return s.key, nil
 	})
 	if err != nil {
-		if err == jwt.ErrSignatureInvalid {
+		if err == jwtV5.ErrSignatureInvalid {
 			return nil, err
 		}
 		return nil, err
@@ -52,4 +56,10 @@ func (s *JwtService) ValidateJWT(tokenStr string) (*Claims, error) {
 		return nil, err
 	}
 	return claims, nil
+}
+
+func GetClaims(c *fiber.Ctx) jwt.MapClaims {
+	user := c.Locals("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	return claims
 }
