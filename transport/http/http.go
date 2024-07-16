@@ -71,12 +71,13 @@ func (h *HTTP) SetupAndServe(app *fiber.App) {
 
 func (h *HTTP) setupSwaggerDocs(app *fiber.App) {
 	if h.Config.Server.Env == "development" {
-		swaggerURL := "./docs/swagger.yaml"
+		swaggerURL := "./docs/swagger.json"
 		cfg := swagger.Config{
 			BasePath: "/",
 			FilePath: swaggerURL,
 			Path:     "swagger",
 			Title:    "Swagger API Docs",
+			CacheAge: 0,
 		}
 		app.Use(swagger.New(cfg))
 		log.Info().Str("url", swaggerURL).Msg("Swagger documentation enabled.")
