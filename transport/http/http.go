@@ -71,7 +71,7 @@ func (h *HTTP) SetupAndServe(app *fiber.App) {
 
 func (h *HTTP) setupSwaggerDocs(app *fiber.App) {
 	if h.Config.Server.Env == "development" {
-		swaggerURL := "./docs/swagger.json"
+		swaggerURL := "./docs/swagger.yaml"
 		cfg := swagger.Config{
 			BasePath: "/",
 			FilePath: swaggerURL,

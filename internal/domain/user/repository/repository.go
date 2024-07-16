@@ -5,6 +5,7 @@ import (
 )
 
 type UserRepository interface {
+	UserRepo
 }
 
 type UserRepositoryMySQL struct {
