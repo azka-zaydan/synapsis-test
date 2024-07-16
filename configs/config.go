@@ -34,6 +34,9 @@ type Config struct {
 				DB       int    `mapstructure:"DB"`
 			}
 		}
+		Token struct {
+			ExpiresIn time.Duration `mapstructure:"EXPIRES_IN"`
+		} `mapstructure:"TOKEN"`
 	}
 
 	DB struct {
