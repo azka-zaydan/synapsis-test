@@ -11,9 +11,12 @@ import (
 	"github.com/azka-zaydan/synapsis-test/infras"
 	// "github.com/azka-zaydan/synapsis-test/internal/domain/foobarbaz"
 	authService "github.com/azka-zaydan/synapsis-test/internal/domain/auth/service"
+	productRepo "github.com/azka-zaydan/synapsis-test/internal/domain/product/repository"
+	productService "github.com/azka-zaydan/synapsis-test/internal/domain/product/service"
 	userRepo "github.com/azka-zaydan/synapsis-test/internal/domain/user/repository"
 	authHandler "github.com/azka-zaydan/synapsis-test/internal/handlers/auth"
 	productHandler "github.com/azka-zaydan/synapsis-test/internal/handlers/product"
+
 	"github.com/azka-zaydan/synapsis-test/transport/http"
 	"github.com/azka-zaydan/synapsis-test/transport/http/middleware"
 	"github.com/azka-zaydan/synapsis-test/transport/http/router"
@@ -45,9 +48,16 @@ var domainAuth = wire.NewSet(
 	wire.Bind(new(authService.AuthService), new(*authService.AuthServiceImpl)),
 )
 
+var domainProduct = wire.NewSet(
+	productRepo.ProvideProductRepositoryMySQL,
+	wire.Bind(new(productRepo.ProductRepository), new(*productRepo.ProductRepositoryMySQL)),
+	productService.ProvideProductServiceImpl,
+	wire.Bind(new(productService.ProductService), new(*productService.ProductServiceImpl)),
+)
+
 // Wiring for all domains.
 var domains = wire.NewSet(
-	domainAuth, domainUser,
+	domainAuth, domainUser, domainProduct,
 )
 
 // Wiring for HTTP routing.
