@@ -20,13 +20,13 @@ clean:
 	@rm -rf .cover wire_gen.go docs
 
 docker_build:
-	docker build -t synapsis-test -f Dockerfile-local .
+	docker compose build 
 
 docker_start:
-	docker-compose up --build
+	docker compose up -d
 
 docker_stop:
-	docker-compose down
+	docker compose down
 
 lint-prepare:
 	@echo "Installing golangci-lint" 
@@ -37,5 +37,5 @@ lint:
 
 generate:
 	go generate ./...
-	
+   
 .PHONY: test coverage engine clean build docker run stop lint-prepare lint documents generate
