@@ -17,16 +17,5 @@ type User struct {
 	CreatedBy     uuid.UUID     `db:"created_by"`
 	UpdatedBy     uuid.UUID     `db:"updated_by"`
 	DeletedBy     uuid.NullUUID `db:"deleted_by"`
-}
-
-func NewUser(username, hashedPass string) User {
-	id, _ := uuid.NewV4()
-	return User{
-		ID:            id,
-		Username:      username,
-		Password:      hashedPass,
-		MetaCreatedAt: time.Now(),
-		CreatedBy:     id,
-		UpdatedBy:     id,
-	}
+	CartID        uuid.NullUUID `db:"-"`
 }

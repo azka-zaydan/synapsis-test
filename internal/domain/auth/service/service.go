@@ -7,8 +7,9 @@ import (
 	"github.com/azka-zaydan/synapsis-test/configs"
 	"github.com/azka-zaydan/synapsis-test/infras"
 	"github.com/azka-zaydan/synapsis-test/internal/domain/auth/model/dto"
-	"github.com/azka-zaydan/synapsis-test/internal/domain/user/model"
+	userDto "github.com/azka-zaydan/synapsis-test/internal/domain/user/model/dto"
 	userRepo "github.com/azka-zaydan/synapsis-test/internal/domain/user/repository"
+	userSvc "github.com/azka-zaydan/synapsis-test/internal/domain/user/service"
 	"github.com/azka-zaydan/synapsis-test/shared/failure"
 	"github.com/azka-zaydan/synapsis-test/shared/hash"
 	"github.com/azka-zaydan/synapsis-test/shared/jwt"
@@ -26,13 +27,15 @@ type AuthServiceImpl struct {
 	Redis      *infras.Redis
 	Config     *configs.Config
 	UserRepo   userRepo.UserRepository
+	UserSvc    userSvc.UserService
 	JwtService *jwt.JwtService
 }
 
-func ProvideAuthServiceImpl(cfg *configs.Config, redis *infras.Redis, userRepo userRepo.UserRepository) *AuthServiceImpl {
+func ProvideAuthServiceImpl(cfg *configs.Config, redis *infras.Redis, userRepo userRepo.UserRepository, userSvc userSvc.UserService) *AuthServiceImpl {
 	return &AuthServiceImpl{
 		Config:     cfg,
 		Redis:      redis,
+		UserSvc:    userSvc,
 		UserRepo:   userRepo,
 		JwtService: jwt.NewJwtService(cfg),
 	}
@@ -57,14 +60,17 @@ func (s *AuthServiceImpl) Register(ctx context.Context, req dto.RegisterDto) (re
 		log.Error().Err(err).Msg("[Register] Failed Hash Password")
 		return
 	}
-	user := model.NewUser(req.Username, hashedPass)
 
-	err = s.UserRepo.CreateUser(ctx, &user)
+	user, err := s.UserSvc.CreateUser(ctx, userDto.CreateUserRequest{
+		Username: req.Username,
+		Password: hashedPass,
+	})
 	if err != nil {
-		log.Error().Err(err).Msg("[Register] Failed CreateUser")
+		log.Error().Err(err).Msg("[Register] Failed Create User")
 		return
 	}
-	token, err := s.JwtService.GenerateJWT(user.Username, user.ID.String())
+
+	token, err := s.JwtService.GenerateJWT(user.Username, user.ID)
 	if err != nil {
 		log.Error().Err(err).Msg("[Register] Failed Generate Token")
 		return

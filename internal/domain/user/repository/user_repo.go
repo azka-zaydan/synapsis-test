@@ -64,6 +64,6 @@ func (repo *UserRepositoryMySQL) CreateUser(ctx context.Context, user *model.Use
 // queries
 var (
 	userInsertQuery = `
-	INSERT INTO user (id, username, password_hash, created_by, meta_created_at, updated_by)
-	VALUES (:id, :username, :password_hash, :created_by, :meta_created_at, :updated_by)`
+	INSERT INTO user (id, username, password_hash, created_by, updated_by)
+	VALUES (:id, :username, :password_hash, :created_by, :updated_by)`
 )
