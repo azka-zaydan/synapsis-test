@@ -2,12 +2,17 @@ package service
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"sync"
 
+	"github.com/azka-zaydan/synapsis-test/configs"
+	"github.com/azka-zaydan/synapsis-test/infras"
 	"github.com/azka-zaydan/synapsis-test/internal/domain/cart/model"
 	"github.com/azka-zaydan/synapsis-test/internal/domain/cart/model/dto"
 	"github.com/azka-zaydan/synapsis-test/internal/domain/cart/repository"
 	"github.com/gofrs/uuid"
+	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
 )
 
@@ -19,16 +24,34 @@ type CartService interface {
 }
 
 type CartServiceImpl struct {
-	Repo repository.CartRepository
+	Repo   repository.CartRepository
+	Redis  *infras.Redis
+	config *configs.Config
 }
 
-func ProvideCartServiceImpl(repo repository.CartRepository) *CartServiceImpl {
+func ProvideCartServiceImpl(repo repository.CartRepository, redis *infras.Redis, config *configs.Config) *CartServiceImpl {
 	return &CartServiceImpl{
-		Repo: repo,
+		Redis:  redis,
+		Repo:   repo,
+		config: config,
 	}
 }
 
 func (s *CartServiceImpl) ListItems(ctx context.Context, userID uuid.UUID) (res dto.ListItemsResponse, err error) {
+	exist, err := s.isListItemsCacheAvailable(ctx, userID.String())
+	if err != nil {
+		log.Error().Err(err).Msg("[ListItems] Failed isListItemsCacheAvailable")
+		return
+	}
+	if exist {
+		log.Info().Msg("[ListItems] Using From Cache")
+		res, err = s.getListItemsCache(ctx, userID.String())
+		if err != nil {
+			log.Error().Err(err).Msg("[ListItems] Failed getListItemsCache")
+			return
+		}
+		return
+	}
 	cart, err := s.Repo.GetCartByUserID(ctx, userID.String())
 	if err != nil {
 		log.Error().Err(err).Msg("[ListItems] Failed GetCartByUserID")
@@ -40,7 +63,64 @@ func (s *CartServiceImpl) ListItems(ctx context.Context, userID uuid.UUID) (res 
 		return
 	}
 
+	res = dto.NewListItemsResponse(cart, items)
+
+	err = s.setListItemsCache(ctx, userID.String(), res)
+	if err != nil {
+		log.Error().Err(err).Msg("[setListItemsCache] Failed setListItemsCache")
+		return
+	}
+
 	return dto.NewListItemsResponse(cart, items), nil
+}
+
+func (s *CartServiceImpl) isListItemsCacheAvailable(ctx context.Context, userId string) (exist bool, err error) {
+	_, err = s.Redis.Client.Get(ctx, fmt.Sprintf("cart:{%s}", userId)).Result()
+	if err != nil {
+		if err == redis.Nil {
+			return false, nil
+		}
+		log.Error().Err(err).Msg("[isListItemsCacheAvailable] Failed Getting From Redis")
+		return false, err
+	}
+	return true, nil
+}
+
+func (s *CartServiceImpl) getListItemsCache(ctx context.Context, userId string) (res dto.ListItemsResponse, err error) {
+	data, err := s.Redis.Client.Get(ctx, fmt.Sprintf("cart:{%s}", userId)).Result()
+	if err != nil {
+		log.Error().Err(err).Msg("[getListItemsCache] Failed Get Cache")
+		return
+	}
+	err = json.Unmarshal([]byte(data), &res)
+	if err != nil {
+		log.Error().Err(err).Msg("[setListItemsCache] Failed Unmarshal Response")
+		return
+	}
+	return
+}
+
+func (s *CartServiceImpl) setListItemsCache(ctx context.Context, userId string, res dto.ListItemsResponse) (err error) {
+	marshaled, err := json.Marshal(res)
+	if err != nil {
+		log.Error().Err(err).Msg("[setListItemsCache] Failed Marshal Response")
+		return
+	}
+	_, err = s.Redis.Client.Set(ctx, fmt.Sprintf("cart:{%s}", userId), marshaled, s.config.Cache.Cart.ExpiresIn).Result()
+	if err != nil {
+		log.Error().Err(err).Msg("[setListItemsCache] Failed Set Cache")
+		return
+	}
+	return
+}
+
+func (s *CartServiceImpl) deleteListItemsCache(ctx context.Context, userId string) (err error) {
+	_, err = s.Redis.Client.Del(ctx, fmt.Sprintf("cart:{%s}", userId)).Result()
+	if err != nil {
+		log.Error().Err(err).Msg("[deleteListItemsCache] Failed Del Cache")
+		return
+	}
+	return
 }
 
 func (s *CartServiceImpl) CreateCart(ctx context.Context, req dto.CreateCartRequest) (res dto.CartResponse, err error) {
@@ -80,6 +160,11 @@ func (s *CartServiceImpl) AddItems(ctx context.Context, req dto.AddItemsRequest,
 	newItems, newCart, err := s.addOrUpdateItems(ctx, existingItems, req, cart)
 	if err != nil {
 		log.Error().Err(err).Msg("[AddItems] Failed addOrUpdateItems")
+		return
+	}
+	err = s.deleteListItemsCache(ctx, userID.String())
+	if err != nil {
+		log.Error().Err(err).Msg("[AddItems] Failed deleteListItemsCache")
 		return
 	}
 	return dto.NewListItemsResponse(newCart, newItems), nil
@@ -180,6 +265,11 @@ func (s *CartServiceImpl) DeleteItems(ctx context.Context, req dto.DeleteItemsRe
 	newItems, newCart, err := s.removeOrUpdateItems(ctx, existingItems, req, cart)
 	if err != nil {
 		log.Error().Err(err).Msg("[DeleteItems] Failed removeOrUpdateItems")
+		return
+	}
+	err = s.deleteListItemsCache(ctx, userID.String())
+	if err != nil {
+		log.Error().Err(err).Msg("[DeleteItems] Failed deleteListItemsCache")
 		return
 	}
 	return dto.NewListItemsResponse(newCart, newItems), nil
