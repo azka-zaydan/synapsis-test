@@ -2,7 +2,6 @@ package http
 
 import (
 	"fmt"
-	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -135,25 +134,6 @@ func (h *HTTP) logCORSConfigInfo() {
 	} else {
 		log.Info().Msg("CORS Headers are disabled.")
 	}
-}
-
-func (h *HTTP) serverStateMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch h.State {
-		case ServerStateReady:
-			// Server is ready to serve, don't do anything.
-			next.ServeHTTP(w, r)
-		case ServerStateInGracePeriod:
-			// Server is in grace period. Issue a warning message and continue
-			// serving as usual.
-			log.Warn().Msg("SERVER IS IN GRACE PERIOD")
-			next.ServeHTTP(w, r)
-		case ServerStateInCleanupPeriod:
-			// Server is in cleanup period. Stop the request from actually
-			// invoking any domain services and respond appropriately.
-			response.WithPreparingShutdown(w)
-		}
-	})
 }
 
 func (h *HTTP) setupCORS() {
