@@ -11,10 +11,15 @@ import (
 	"github.com/azka-zaydan/synapsis-test/infras"
 	// "github.com/azka-zaydan/synapsis-test/internal/domain/foobarbaz"
 	authService "github.com/azka-zaydan/synapsis-test/internal/domain/auth/service"
+	cartRepo "github.com/azka-zaydan/synapsis-test/internal/domain/cart/repository"
+	cartSvc "github.com/azka-zaydan/synapsis-test/internal/domain/cart/service"
 	productRepo "github.com/azka-zaydan/synapsis-test/internal/domain/product/repository"
 	productService "github.com/azka-zaydan/synapsis-test/internal/domain/product/service"
 	userRepo "github.com/azka-zaydan/synapsis-test/internal/domain/user/repository"
+	userSvc "github.com/azka-zaydan/synapsis-test/internal/domain/user/service"
+
 	authHandler "github.com/azka-zaydan/synapsis-test/internal/handlers/auth"
+	cartHandler "github.com/azka-zaydan/synapsis-test/internal/handlers/cart"
 	productHandler "github.com/azka-zaydan/synapsis-test/internal/handlers/product"
 
 	"github.com/azka-zaydan/synapsis-test/transport/http"
@@ -41,6 +46,8 @@ var authMiddleware = wire.NewSet(
 var domainUser = wire.NewSet(
 	userRepo.ProvideUserRepositoryMySQL,
 	wire.Bind(new(userRepo.UserRepository), new(*userRepo.UserRepositoryMySQL)),
+	userSvc.ProvideUserServiceImpl,
+	wire.Bind(new(userSvc.UserService), new(*userSvc.UserServiceImpl)),
 )
 
 var domainAuth = wire.NewSet(
@@ -55,9 +62,16 @@ var domainProduct = wire.NewSet(
 	wire.Bind(new(productService.ProductService), new(*productService.ProductServiceImpl)),
 )
 
+var domainCart = wire.NewSet(
+	cartRepo.ProvideCartRepositoryMySQL,
+	wire.Bind(new(cartRepo.CartRepository), new(*cartRepo.CartRepositoryMySQL)),
+	cartSvc.ProvideCartServiceImpl,
+	wire.Bind(new(cartSvc.CartService), new(*cartSvc.CartServiceImpl)),
+)
+
 // Wiring for all domains.
 var domains = wire.NewSet(
-	domainAuth, domainUser, domainProduct,
+	domainAuth, domainUser, domainProduct, domainCart,
 )
 
 // Wiring for HTTP routing.
@@ -66,6 +80,7 @@ var routing = wire.NewSet(
 	router.ProvideRouter,
 	authHandler.ProvideAuthHandler,
 	productHandler.ProvideProductHandler,
+	cartHandler.ProvideCartHandler,
 )
 
 // Wiring for everything.
