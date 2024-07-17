@@ -8,7 +8,8 @@ CREATE TABLE IF NOT EXISTS user (
     updated_by CHAR(36) NOT NULL,
     meta_updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted_by CHAR(36),
-    meta_deleted_at TIMESTAMP
+    meta_deleted_at TIMESTAMP,
+    INDEX idx_username (username)
 );
 
 -- Order Table
@@ -74,6 +75,8 @@ CREATE TABLE IF NOT EXISTS cart (
     meta_created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by CHAR(36) NOT NULL,
     meta_updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_by CHAR(36),
+    meta_deleted_at TIMESTAMP,
     INDEX idx_user_id (user_id),
     INDEX idx_created_by (created_by)
 );
@@ -89,6 +92,8 @@ CREATE TABLE IF NOT EXISTS cart_item (
     meta_created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by CHAR(36) NOT NULL,
     meta_updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_by CHAR(36),
+    meta_deleted_at TIMESTAMP,
     INDEX idx_cart_id (cart_id),
     INDEX idx_product_id (product_id),
     INDEX idx_created_by (created_by)
@@ -97,6 +102,7 @@ CREATE TABLE IF NOT EXISTS cart_item (
 -- Payment Table
 CREATE TABLE IF NOT EXISTS payment (
     id CHAR(36) PRIMARY KEY NOT NULL,
+    order_id char(36) NOT NULL,
     user_id CHAR(36) NOT NULL,
     payment_method CHAR(36) NOT NULL,
     total_price DECIMAL(10, 2) NOT NULL,
@@ -106,6 +112,8 @@ CREATE TABLE IF NOT EXISTS payment (
     meta_created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by CHAR(36) NOT NULL,
     meta_updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_by CHAR(36),
+    meta_deleted_at TIMESTAMP,
     INDEX idx_user_id (user_id),
     INDEX idx_payment_method (payment_method),
     INDEX idx_created_by (created_by)
@@ -122,6 +130,8 @@ CREATE TABLE IF NOT EXISTS order_detail (
     meta_created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by CHAR(36) NOT NULL,
     meta_updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_by CHAR(36),
+    meta_deleted_at TIMESTAMP,
     INDEX idx_order_id (order_id),
     INDEX idx_product_id (product_id),
     INDEX idx_created_by (created_by)
