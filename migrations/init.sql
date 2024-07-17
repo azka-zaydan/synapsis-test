@@ -1,51 +1,51 @@
+-- User Table
 CREATE TABLE IF NOT EXISTS user (
     id CHAR(36) PRIMARY KEY NOT NULL,
-    username VARCHAR(255),
+    username VARCHAR(255) NOT NULL,
     password_hash TEXT NOT NULL,
     created_by CHAR(36) NOT NULL,
-    meta_created_at TIMESTAMP NOT NULL,
+    meta_created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by CHAR(36) NOT NULL,
-    meta_updated_at TIMESTAMP NOT NULL,
+    meta_updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted_by CHAR(36),
-    meta_deleted_at TIMESTAMP,
-    INDEX idx_username (username)
+    meta_deleted_at TIMESTAMP
 );
 
+-- Order Table
 CREATE TABLE IF NOT EXISTS `order` (
     id CHAR(36) PRIMARY KEY NOT NULL,
-    order_detail CHAR(36) NOT NULL,
     user_id CHAR(36) NOT NULL,
-    product_id CHAR(36) NOT NULL,
+    payment_id CHAR(36) NOT NULL,
     total_price DECIMAL(10, 2) NOT NULL,
     status INT NOT NULL,
     order_at TIMESTAMP NOT NULL,
     payment_at TIMESTAMP,
     completed_at TIMESTAMP,
     created_by CHAR(36) NOT NULL,
-    meta_created_at TIMESTAMP NOT NULL,
+    meta_created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by CHAR(36) NOT NULL,
-    meta_updated_at TIMESTAMP NOT NULL,
+    meta_updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted_by CHAR(36),
     meta_deleted_at TIMESTAMP,
     INDEX idx_user_id (user_id),
-    INDEX idx_product_id (product_id),
-    INDEX idx_status (status),
-    INDEX idx_order_detail (order_detail),
+    INDEX idx_payment_id (payment_id),
     INDEX idx_created_by (created_by)
 );
 
+-- Category Table
 CREATE TABLE IF NOT EXISTS category (
     id CHAR(36) PRIMARY KEY NOT NULL,
-    name VARCHAR(266) NOT NULL,
+    name VARCHAR(255) NOT NULL,
     created_by CHAR(36) NOT NULL,
-    meta_created_at TIMESTAMP NOT NULL,
+    meta_created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by CHAR(36) NOT NULL,
-    meta_updated_at TIMESTAMP NOT NULL,
+    meta_updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted_by CHAR(36),
     meta_deleted_at TIMESTAMP,
     INDEX idx_created_by (created_by)
 );
 
+-- Product Table
 CREATE TABLE IF NOT EXISTS product (
     id CHAR(36) PRIMARY KEY NOT NULL,
     category_id CHAR(36) NOT NULL,
@@ -54,9 +54,9 @@ CREATE TABLE IF NOT EXISTS product (
     price DECIMAL(10, 2) NOT NULL,
     stock INT NOT NULL,
     created_by CHAR(36) NOT NULL,
-    meta_created_at TIMESTAMP NOT NULL,
+    meta_created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by CHAR(36) NOT NULL,
-    meta_updated_at TIMESTAMP NOT NULL,
+    meta_updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted_by CHAR(36),
     meta_deleted_at TIMESTAMP,
     INDEX idx_category_id (category_id),
@@ -64,6 +64,7 @@ CREATE TABLE IF NOT EXISTS product (
     INDEX idx_created_by (created_by)
 );
 
+-- Cart Table
 CREATE TABLE IF NOT EXISTS cart (
     id CHAR(36) PRIMARY KEY NOT NULL,
     user_id CHAR(36) NOT NULL,
@@ -73,55 +74,55 @@ CREATE TABLE IF NOT EXISTS cart (
     meta_created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by CHAR(36) NOT NULL,
     meta_updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    deleted_by CHAR(36),
-    meta_deleted_at TIMESTAMP,
     INDEX idx_user_id (user_id),
     INDEX idx_created_by (created_by)
 );
 
-
+-- Cart Item Table
 CREATE TABLE IF NOT EXISTS cart_item (
     id CHAR(36) PRIMARY KEY NOT NULL,
     cart_id CHAR(36) NOT NULL,
     product_id CHAR(36) NOT NULL,
     quantity INT NOT NULL,
+    total_price DECIMAL(10, 2) NOT NULL,
     created_by CHAR(36) NOT NULL,
-    meta_created_at TIMESTAMP NOT NULL,
+    meta_created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by CHAR(36) NOT NULL,
-    meta_updated_at TIMESTAMP NOT NULL,
-    deleted_by CHAR(36),
-    meta_deleted_at TIMESTAMP,
+    meta_updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_cart_id (cart_id),
     INDEX idx_product_id (product_id),
     INDEX idx_created_by (created_by)
 );
 
+-- Payment Table
 CREATE TABLE IF NOT EXISTS payment (
     id CHAR(36) PRIMARY KEY NOT NULL,
+    user_id CHAR(36) NOT NULL,
     payment_method CHAR(36) NOT NULL,
+    total_price DECIMAL(10, 2) NOT NULL,
     status INT NOT NULL,
+    payment_at TIMESTAMP,
     created_by CHAR(36) NOT NULL,
-    meta_created_at TIMESTAMP NOT NULL,
+    meta_created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by CHAR(36) NOT NULL,
-    meta_updated_at TIMESTAMP NOT NULL,
-    deleted_by CHAR(36),
-    meta_deleted_at TIMESTAMP,
+    meta_updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_user_id (user_id),
     INDEX idx_payment_method (payment_method),
-    INDEX idx_status (status),
     INDEX idx_created_by (created_by)
 );
 
+-- Order Detail Table
 CREATE TABLE IF NOT EXISTS order_detail (
     id CHAR(36) PRIMARY KEY NOT NULL,
+    order_id CHAR(36) NOT NULL,
     product_id CHAR(36) NOT NULL,
     total_items INT NOT NULL,
     subtotal_product_price DECIMAL(10, 2) NOT NULL,
     created_by CHAR(36) NOT NULL,
-    meta_created_at TIMESTAMP NOT NULL,
+    meta_created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by CHAR(36) NOT NULL,
-    meta_updated_at TIMESTAMP NOT NULL,
-    deleted_by CHAR(36),
-    meta_deleted_at TIMESTAMP,
+    meta_updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_order_id (order_id),
     INDEX idx_product_id (product_id),
     INDEX idx_created_by (created_by)
 );
