@@ -15,7 +15,7 @@ type JwtService struct {
 }
 
 type Claims struct {
-	UserID   string `json:"UserID"`
+	UserID   string `json:"userID"`
 	Username string `json:"username"`
 	jwtV5.RegisteredClaims
 }
