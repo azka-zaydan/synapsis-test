@@ -1,37 +1,37 @@
 services:
-  synap-mysql:
-    image: mysql:latest
-    container_name: synap-mysql-db
-    ports:
-      - "3306:3306"
-    environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-    volumes:
-      - /home/$USER:/var/lib/mysql
-    expose:
-      - "3306"
+  # synap-mysql:
+  #   image: mysql:latest
+  #   container_name: synap-mysql-db
+  #   ports:
+  #     - "3306:3306"
+  #   environment:
+  #     MYSQL_DATABASE: ${MYSQL_DATABASE}
+  #     MYSQL_USER: ${MYSQL_USER}
+  #     MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+  #     MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+  #   volumes:
+  #     - /home/$USER:/var/lib/mysql
+  #   expose:
+  #     - "3306"
 
-  synap-redis:
-    image: redis:latest
-    container_name: synap-redis
-    restart: always
-    ports:
-      - "6378:6379"
-    volumes:
-      - /home/$USER:/root/redis
-    environment:
-      REDIS_PORT: "6379"
-      REDIS_DATABASES: "16"
-      REDIS_PASSWORD: "${REDIS_PASSWORD}"
+  # synap-redis:
+  #   image: redis:latest
+  #   container_name: synap-redis
+  #   restart: always
+  #   ports:
+  #     - "6378:6379"
+  #   volumes:
+  #     - /home/$USER:/root/redis
+  #   environment:
+  #     REDIS_PORT: "6379"
+  #     REDIS_DATABASES: "16"
+  #     REDIS_PASSWORD: "${REDIS_PASSWORD}"
 
   backend:
     container_name: synap-be
     image: azka1415/synap-be:latest
     build: .
     env_file:
-      - .env
+      - ".env"
     ports:
       - 3000:3000
