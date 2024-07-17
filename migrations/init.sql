@@ -68,15 +68,17 @@ CREATE TABLE IF NOT EXISTS cart (
     id CHAR(36) PRIMARY KEY NOT NULL,
     user_id CHAR(36) NOT NULL,
     total_items INT NOT NULL,
+    total_price DECIMAL(10, 2) NOT NULL,
     created_by CHAR(36) NOT NULL,
-    meta_created_at TIMESTAMP NOT NULL,
+    meta_created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by CHAR(36) NOT NULL,
-    meta_updated_at TIMESTAMP NOT NULL,
+    meta_updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted_by CHAR(36),
     meta_deleted_at TIMESTAMP,
     INDEX idx_user_id (user_id),
     INDEX idx_created_by (created_by)
 );
+
 
 CREATE TABLE IF NOT EXISTS cart_item (
     id CHAR(36) PRIMARY KEY NOT NULL,
