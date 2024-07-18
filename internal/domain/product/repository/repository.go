@@ -16,6 +16,8 @@ import (
 type ProductRepository interface {
 	GetProductByFilter(ctx context.Context, filter *model.Filter) (res []model.Product, totalData int, err error)
 	CreateProduct(ctx context.Context, data *model.Product) (err error)
+	GetProductByID(ctx context.Context, productId string) (res model.Product, err error)
+	UpdateProduct(ctx context.Context, prod *model.Product) (err error)
 }
 
 type ProductRepositoryMySQL struct {
@@ -99,6 +101,24 @@ func (repo *ProductRepositoryMySQL) buildSQLQuery(baseQuery string, filter *mode
 	return baseQuery, args, nil
 }
 
+func (repo *ProductRepositoryMySQL) GetProductByID(ctx context.Context, productId string) (res model.Product, err error) {
+	err = repo.DB.Read.GetContext(ctx, &res, fmt.Sprintf("%s WHERE id = ?", productSelectQuery), productId)
+	if err != nil {
+		logger.ErrorWithStack(err)
+		return
+	}
+	return
+}
+
+func (repo *ProductRepositoryMySQL) UpdateProduct(ctx context.Context, prod *model.Product) (err error) {
+	_, err = repo.DB.Write.NamedExecContext(ctx, productUpdateQuery, prod)
+	if err != nil {
+		logger.ErrorWithStack(err)
+		return
+	}
+	return
+}
+
 var (
 	productSelectQuery = `SELECT 
         id, 
@@ -139,4 +159,14 @@ var (
 		:created_by, 
 		:updated_by
 	)`
+	productUpdateQuery = `
+	UPDATE product SET
+		category_id = :category_id,
+		name = :name,
+		description = :description,
+		price = :price,
+		stock = :stock,
+		updated_by = :updated_by
+	WHERE id = :id
+`
 )
