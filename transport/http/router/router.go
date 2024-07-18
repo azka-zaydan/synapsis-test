@@ -3,6 +3,7 @@ package router
 import (
 	"github.com/azka-zaydan/synapsis-test/internal/handlers/auth"
 	"github.com/azka-zaydan/synapsis-test/internal/handlers/cart"
+	"github.com/azka-zaydan/synapsis-test/internal/handlers/payment"
 	"github.com/azka-zaydan/synapsis-test/internal/handlers/product"
 	"github.com/gofiber/fiber/v2"
 )
@@ -12,6 +13,7 @@ type DomainHandlers struct {
 	AuthHandler    auth.AuthHandler
 	ProductHandler product.ProductHandler
 	CartHandler    cart.CartHandler
+	PaymentHandler payment.PaymentHandler
 }
 
 // Router is the router struct containing handlers.
@@ -32,5 +34,6 @@ func (r *Router) SetupRoutes(app *fiber.App) {
 		r.DomainHandlers.AuthHandler.Router(router)
 		r.DomainHandlers.ProductHandler.Router(router)
 		r.DomainHandlers.CartHandler.Router(router)
+		r.DomainHandlers.PaymentHandler.Router(router)
 	})
 }

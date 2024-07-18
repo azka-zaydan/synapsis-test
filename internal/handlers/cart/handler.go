@@ -23,6 +23,8 @@ func (h *CartHandler) Router(r fiber.Router) {
 	cart.Post("/add-items", h.AddItems)
 	cart.Get("/list-items", h.ListItems)
 	cart.Post("/remove-items", h.DeleteItems)
+
+	cart.Post("/checkout", h.Checkout)
 }
 
 func ProvideCartHandler(svc service.CartService, auth *middleware.Authentication) CartHandler {
@@ -78,19 +80,19 @@ func (h *CartHandler) AddItems(c *fiber.Ctx) error {
 
 	userID, err := uuid.FromString(userIDStr)
 	if err != nil {
-		log.Error().Err(err).Msg("[AddItems] Failed Converting into UUID")
+		log.Error().Err(err).Msg("[AddItemsHandler] Failed Converting into UUID")
 		return response.WithError(c, failure.BadRequest(err))
 	}
 	var req dto.AddItemsRequest
 	err = c.BodyParser(&req)
 	if err != nil {
-		log.Error().Err(err).Msg("[AddItems] Failed Parsing Body")
+		log.Error().Err(err).Msg("[AddItemsHandler] Failed Parsing Body")
 		return response.WithError(c, failure.BadRequest(err))
 	}
 
 	res, err := h.CartSvc.AddItems(c.Context(), req, userID)
 	if err != nil {
-		log.Error().Err(err).Msg("[AddItems] Failed ListItems")
+		log.Error().Err(err).Msg("[AddItemsHandler] Failed ListItems")
 		return response.WithError(c, err)
 	}
 
@@ -114,19 +116,55 @@ func (h *CartHandler) DeleteItems(c *fiber.Ctx) error {
 
 	userID, err := uuid.FromString(userIDStr)
 	if err != nil {
-		log.Error().Err(err).Msg("[AddItems] Failed Converting into UUID")
+		log.Error().Err(err).Msg("[DeleteItemsHandler] Failed Converting into UUID")
 		return response.WithError(c, failure.BadRequest(err))
 	}
 	var req dto.DeleteItemsRequest
 	err = c.BodyParser(&req)
 	if err != nil {
-		log.Error().Err(err).Msg("[AddItems] Failed Parsing Body")
+		log.Error().Err(err).Msg("[DeleteItemsHandler] Failed Parsing Body")
 		return response.WithError(c, failure.BadRequest(err))
 	}
 
 	res, err := h.CartSvc.DeleteItems(c.Context(), req, userID)
 	if err != nil {
-		log.Error().Err(err).Msg("[AddItems] Failed ListItems")
+		log.Error().Err(err).Msg("[DeleteItemsHandler] Failed ListItems")
+		return response.WithError(c, err)
+	}
+
+	return response.WithJSON(c, fiber.StatusOK, res)
+}
+
+// Checkout checks out items based on request
+// @Summary checks out items based on request
+// @Description This endpoint checks out items based on request
+// @Tags v1/cart
+// @Param Authorization header string true "Bearer Token"
+// @Param addItemsRequest body dto.CheckoutRequest true "items to be deleted"
+// @Produce json
+// @Success 201 {object} response.Base{}
+// @Failure 400 {object} response.Base
+// @Failure 409 {object} response.Base
+// @Failure 500 {object} response.Base
+// @Router /v1/cart/checkout [post]
+func (h *CartHandler) Checkout(c *fiber.Ctx) error {
+	userIDStr := jwt.GetClaims(c)["userID"].(string)
+
+	userID, err := uuid.FromString(userIDStr)
+	if err != nil {
+		log.Error().Err(err).Msg("[CheckoutHandler] Failed Converting into UUID")
+		return response.WithError(c, failure.BadRequest(err))
+	}
+	var req dto.CheckoutRequest
+	err = c.BodyParser(&req)
+	if err != nil {
+		log.Error().Err(err).Msg("[CheckoutHandler] Failed Parsing Body")
+		return response.WithError(c, failure.BadRequest(err))
+	}
+
+	res, err := h.CartSvc.Checkout(c.Context(), req, userID)
+	if err != nil {
+		log.Error().Err(err).Msg("[CheckoutHandler] Failed ListItems")
 		return response.WithError(c, err)
 	}
 

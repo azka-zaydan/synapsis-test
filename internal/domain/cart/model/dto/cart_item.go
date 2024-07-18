@@ -40,10 +40,19 @@ func NewCartItemResponse(item model.CartItem) CartItemResponse {
 
 type AddItemsRequest []ItemRequest
 
+type CheckoutRequest []CheckoutItem
+
 type DeleteItemsRequest []DeleteItemRequest
 
 type ItemRequest struct {
 	ProductID string  `json:"productId"`
+	Quantity  int     `json:"quantity"`
+	Price     float64 `json:"price"`
+}
+
+type CheckoutItem struct {
+	ItemId    string  `json:"itemId"`
+	ProductId string  `json:"productId"`
 	Quantity  int     `json:"quantity"`
 	Price     float64 `json:"price"`
 }
@@ -53,6 +62,22 @@ type CartItemCreateRequest struct {
 	ProductID string  `json:"productId"`
 	Quantity  int     `json:"quantity"`
 	Price     float64 `json:"price"`
+}
+
+type CheckoutResponse struct {
+	OrderID    string    `json:"orderId"`
+	OrderAt    time.Time `json:"orderAt"`
+	TotalItems int       `json:"totalItems"`
+	TotalPrice float64   `json:"totalPrice"`
+}
+
+func NewCheckoutResponse(orderId string, orderAt time.Time, totalItems int, totalPrice float64) CheckoutResponse {
+	return CheckoutResponse{
+		OrderID:    orderId,
+		OrderAt:    orderAt,
+		TotalItems: totalItems,
+		TotalPrice: totalPrice,
+	}
 }
 
 type DeleteItemRequest struct {

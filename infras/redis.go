@@ -17,7 +17,7 @@ type Redis struct {
 func RedisNewClient(config *configs.Config) *Redis {
 	client := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%s", config.Cache.Redis.Primary.Host, config.Cache.Redis.Primary.Port),
-		Password: config.DB.MySQL.Read.Password,
+		Password: config.Cache.Redis.Primary.Password,
 		DB:       config.Cache.Redis.Primary.DB,
 	})
 

@@ -13,13 +13,17 @@ import (
 	authService "github.com/azka-zaydan/synapsis-test/internal/domain/auth/service"
 	cartRepo "github.com/azka-zaydan/synapsis-test/internal/domain/cart/repository"
 	cartSvc "github.com/azka-zaydan/synapsis-test/internal/domain/cart/service"
+	orderRepo "github.com/azka-zaydan/synapsis-test/internal/domain/order/repository"
+	orderSvc "github.com/azka-zaydan/synapsis-test/internal/domain/order/service"
+	paymentRepo "github.com/azka-zaydan/synapsis-test/internal/domain/payment/repository"
+	paymentSvc "github.com/azka-zaydan/synapsis-test/internal/domain/payment/service"
 	productRepo "github.com/azka-zaydan/synapsis-test/internal/domain/product/repository"
 	productService "github.com/azka-zaydan/synapsis-test/internal/domain/product/service"
 	userRepo "github.com/azka-zaydan/synapsis-test/internal/domain/user/repository"
 	userSvc "github.com/azka-zaydan/synapsis-test/internal/domain/user/service"
-
 	authHandler "github.com/azka-zaydan/synapsis-test/internal/handlers/auth"
 	cartHandler "github.com/azka-zaydan/synapsis-test/internal/handlers/cart"
+	paymentHandler "github.com/azka-zaydan/synapsis-test/internal/handlers/payment"
 	productHandler "github.com/azka-zaydan/synapsis-test/internal/handlers/product"
 
 	"github.com/azka-zaydan/synapsis-test/transport/http"
@@ -69,9 +73,23 @@ var domainCart = wire.NewSet(
 	wire.Bind(new(cartSvc.CartService), new(*cartSvc.CartServiceImpl)),
 )
 
+var domainPayment = wire.NewSet(
+	paymentRepo.ProvidePaymentRepositoryMySQL,
+	wire.Bind(new(paymentRepo.PaymentRepository), new(*paymentRepo.PaymentRepositoryMySQL)),
+	paymentSvc.ProvidePaymentServiceImpl,
+	wire.Bind(new(paymentSvc.PaymentService), new(*paymentSvc.PaymentServiceImpl)),
+)
+
+var domainOrder = wire.NewSet(
+	orderRepo.ProvideOrderRepositoryMySQL,
+	wire.Bind(new(orderRepo.OrderRepository), new(*orderRepo.OrderRepositoryMySQL)),
+	orderSvc.ProvideOrderServiceImpl,
+	wire.Bind(new(orderSvc.OrderService), new(*orderSvc.OrderServiceImpl)),
+)
+
 // Wiring for all domains.
 var domains = wire.NewSet(
-	domainAuth, domainUser, domainProduct, domainCart,
+	domainAuth, domainUser, domainProduct, domainCart, domainPayment, domainOrder,
 )
 
 // Wiring for HTTP routing.
@@ -81,6 +99,7 @@ var routing = wire.NewSet(
 	authHandler.ProvideAuthHandler,
 	productHandler.ProvideProductHandler,
 	cartHandler.ProvideCartHandler,
+	paymentHandler.ProvidePaymentHandler,
 )
 
 // Wiring for everything.

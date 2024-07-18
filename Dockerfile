@@ -22,8 +22,10 @@ ENV TZ=Asia/Jakarta
 
 WORKDIR /app 
 
-EXPOSE 9090
+EXPOSE 3000
 
 COPY --from=builder /app/goBinary /app
+COPY --from=builder /app/.env /app
+COPY --from=builder /app/docs /app/docs
 
 CMD /app/goBinary
