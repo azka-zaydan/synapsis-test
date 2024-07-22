@@ -9,6 +9,7 @@ import (
 	"github.com/azka-zaydan/synapsis-test/shared/logger"
 )
 
+//go:generate go run github.com/golang/mock/mockgen -source repository.go -destination mock/repository.go -package cart_repo_mock
 type CartRepository interface {
 	CreateCart(ctx context.Context, cart *model.Cart) (err error)
 	GetCartByUserID(ctx context.Context, userId string) (res model.Cart, err error)

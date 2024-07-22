@@ -9,6 +9,7 @@ import (
 	"github.com/azka-zaydan/synapsis-test/shared/logger"
 )
 
+//go:generate go run github.com/golang/mock/mockgen -source repository.go -destination mock/repository.go -package order_repo_mock
 type OrderRepository interface {
 	CreateOrder(ctx context.Context, order *model.Order) (err error)
 	CreateOrderDetail(ctx context.Context, detail *model.OrderDetail) (err error)

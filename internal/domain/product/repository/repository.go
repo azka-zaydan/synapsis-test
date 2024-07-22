@@ -13,6 +13,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+//go:generate go run github.com/golang/mock/mockgen -source repository.go -destination mock/repository.go -package product_repo_mock
 type ProductRepository interface {
 	GetProductByFilter(ctx context.Context, filter *model.Filter) (res []model.Product, totalData int, err error)
 	CreateProduct(ctx context.Context, data *model.Product) (err error)

@@ -9,6 +9,7 @@ import (
 	"github.com/azka-zaydan/synapsis-test/shared/logger"
 )
 
+//go:generate go run github.com/golang/mock/mockgen -source repository.go -destination mock/repository.go -package payment_repo_mock
 type PaymentRepository interface {
 	CreatePayment(ctx context.Context, payment *model.Payment) (err error)
 	GetPaymentByOrderID(ctx context.Context, orderId string) (res model.Payment, err error)

@@ -34,17 +34,17 @@ type CartService interface {
 type CartServiceImpl struct {
 	Repo        repository.CartRepository
 	Redis       *infras.Redis
-	config      *configs.Config
+	Config      *configs.Config
 	OrderRepo   orderRepo.OrderRepository
 	PaymentRepo paymentRepo.PaymentRepository
 	ProductRepo productRepo.ProductRepository
 }
 
-func ProvideCartServiceImpl(repo repository.CartRepository, redis *infras.Redis, config *configs.Config, orderRepo orderRepo.OrderRepository, paymentRepo paymentRepo.PaymentRepository, productRepo productRepo.ProductRepository) *CartServiceImpl {
+func ProvideCartServiceImpl(repo repository.CartRepository, redis *infras.Redis, cfg *configs.Config, orderRepo orderRepo.OrderRepository, paymentRepo paymentRepo.PaymentRepository, productRepo productRepo.ProductRepository) *CartServiceImpl {
 	return &CartServiceImpl{
 		Redis:       redis,
 		Repo:        repo,
-		config:      config,
+		Config:      cfg,
 		OrderRepo:   orderRepo,
 		PaymentRepo: paymentRepo,
 		ProductRepo: productRepo,
@@ -120,7 +120,7 @@ func (s *CartServiceImpl) setListItemsCache(ctx context.Context, userId string, 
 		log.Error().Err(err).Msg("[setListItemsCache] Failed Marshal Response")
 		return
 	}
-	_, err = s.Redis.Client.Set(ctx, fmt.Sprintf("cart:{%s}", userId), marshaled, s.config.Cache.Cart.ExpiresIn).Result()
+	_, err = s.Redis.Client.Set(ctx, fmt.Sprintf("cart:{%s}", userId), marshaled, s.Config.Cache.Cart.ExpiresIn).Result()
 	if err != nil {
 		log.Error().Err(err).Msg("[setListItemsCache] Failed Set Cache")
 		return

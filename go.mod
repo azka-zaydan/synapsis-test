@@ -36,6 +36,7 @@ require (
 	github.com/cli/safeexec v1.0.1 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.3 // indirect
 	github.com/creack/pty v1.1.21 // indirect
+	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/fatih/color v1.16.0 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
@@ -50,6 +51,7 @@ require (
 	github.com/go-openapi/strfmt v0.21.8 // indirect
 	github.com/go-openapi/swag v0.22.8 // indirect
 	github.com/go-openapi/validate v0.22.3 // indirect
+	github.com/go-redis/redismock/v9 v9.2.0 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/gohugoio/hugo v0.123.3 // indirect
 	github.com/google/subcommands v1.2.0 // indirect
@@ -76,6 +78,7 @@ require (
 	github.com/spf13/afero v1.11.0 // indirect
 	github.com/spf13/cast v1.6.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/stretchr/testify v1.9.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/tdewolff/parse/v2 v2.7.12 // indirect
 	github.com/urfave/cli/v2 v2.3.0 // indirect
